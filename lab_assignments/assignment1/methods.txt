@@ -1,0 +1,74 @@
+1. Genome
+
+Brachypodium distachyon (stiff brome)
+
+RefSeq assembly accession: GCA_000005505.3 
+
+The reference paper (Lenk et al.) stated the reference genome used could be found on Phytozome. I created a Phytozome account and looked for it,
+but could not find the version the authors used anywhere but NCBI. I used the following command to download the genome to the cluster:
+
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/505/GCF_000005505.3_Brachypodium_distachyon_v3.0/
+GCF_000005505.3_Brachypodium_distachyon_v3.0_genomic.fna.gz
+
+Since the file was compressed, I used gunzip to uncompress it:
+
+gunzip GCF_000005505.3_Brachypodium_distachyon_v3.0_genomic.fna.gz
+
+The genome downloaded as a .fna file, which I searched and found that it stands for "fasta nucleic acid," meaning the file was still in fasta format.
+I changed the name to include the proper file extension using the basic Unix command 'cp'
+
+
+
+To get the annotation file, I clicked "Download assembly" on the same NCBI page for the genome, but chose the GFF file format. This downloaded the 
+annotation file to my local drive, but I uploaded it to the cluster with the following command:
+
+scp /Users/mallorystclair/Downloads/genome_assemblies_genome_gff.tar stmallor@hpcc.msu.edu:/mnt/home/stmallor
+
+After uploading to the cluster, I noticed the file extension for the annotations was gff.tar instead of gff, so I used the following command:
+
+tar -xf genome_assemblies_genome_gff.tar
+
+This file was uncompressed and did not require using the 'gunzip' command.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+2. RNAseq data
+
+The authors listed Gene Expression Omnibus (GEO) accession number GSE126992 as the source for their RNAseq data. I searched this accession number on
+GEO, scrolled to the bottom of the page to where it said "Samples (45)," and clicked '+More..."
+I scrolled through the list of samples, and when I came across one that included "t1-control" or "t1-treated," I clicked on the GSM number to the left
+of it. This took me to another web page with info about the individual sample. I scrolled to the bottom of this webpage to the section titled 
+"Relations," and clicked on the SRX number. This took me to a third webpage, which still had information about the sample. Once on this third page, 
+I scrolled to the bottom to find the SRR number. I copied this number and used prefetch to download all of the sra files to the cluster: 
+
+prefetch SRR8618217
+
+The accessions I downloaded were:
+SRR8618217
+SRR8618218
+SRR8618219
+SRR8618220
+SRR8618221
+SRR8618222
+SRR8618232
+SRR8618233
+SRR8618234
+SRR8618235
+SRR8618236
+SRR8618237
+SRR8618247
+SRR8618248
+SRR8618249
+SRR8618250
+SRR8618251
+SRR8618252
+
+I used fastq-dump to convert the sra files to fastq files and zip them.
+
+fastq-dump --split-files --gzip SRR8618217.sra
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+The screenshot in this repository shows the first 10 lines of the uncompressed fasta file for the reference genome. Another is included to show that
+the SRA files are currently being converted to fastq format and zipped. I will upload a final screenshot of the first 10 lines of one of the fastq 
+files, and another screenshot showing the entire list of fastq files once these jobs are complete. 
