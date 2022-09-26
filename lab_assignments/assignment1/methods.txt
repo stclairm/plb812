@@ -63,12 +63,13 @@ SRR8618250
 SRR8618251
 SRR8618252
 
-I used fastq-dump to convert the sra files to fastq files and zip them.
+I used 'fastq-dump' to convert the sra files to fastq files and 'gzip' to compress them.
 
-fastq-dump --split-files --gzip SRR8618217.sra
+fastq-dump --split-files SRR8618217.sra
+
+gzip SRR8618217_1.fastq
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 
-The screenshot in this repository shows the first 10 lines of the uncompressed fasta file for the reference genome. Another is included to show that
-the SRA files are currently being converted to fastq format and zipped. I will upload a final screenshot of the first 10 lines of one of the fastq 
-files, and another screenshot showing the entire list of fastq files once these jobs are complete. 
+The screenshots in this repository show: the first 10 lines of the uncompressed fasta file for the reference genome, the first 10 lines of one of the 
+uncompressed fastq files, and the entire list of compressed fastq files. 
