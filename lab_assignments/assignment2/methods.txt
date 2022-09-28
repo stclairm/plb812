@@ -1,0 +1,14 @@
+To download fastqc, I used the following command:
+
+conda install -c bioconda fastqc
+
+To run fastqc I used the shell script, run_fastqc.sh 
+(provided in this repository)
+
+sbatch run_fastqc.sh 
+(run in directory with fastq files and where you want fastqc html files output to)
+
+I used Globus file manager to move all of the html files from the working
+directory to plb812/lab_assignments/assignment2 (easier for me to use a 
+file manager with a GUI to move files around and make sure there are no 
+unnecessary duplicates)
