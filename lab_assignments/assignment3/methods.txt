@@ -1,0 +1,10 @@
+The FastQC reports generated from the previous lab assignment showed no adapter content (0% for all types).
+However, it's possible that adapter sequences are still included in the data, just in low concentrations (compared to actual reads), 
+so I used cutadapt to trim Illumina TruSeq 3 adapters from my reads:
+
+cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -o SRRXXXXXXX_1_CA.fastq SRRXXXXXXX_1.fastq
+cutadapt -a AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT -o SRRXXXXXXX_2_CA.fastq SRRXXXXXXX_2.fastq 
+
+I then used fastqc to re-run quality control tests on all the reads:
+
+fastqc ${file_list}
