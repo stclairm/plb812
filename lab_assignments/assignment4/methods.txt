@@ -1,0 +1,94 @@
+1. Build the index
+
+I decided to use HISAT2 to align my reads to the reference. HISAT2 accepts
+HFM index format, so that is the index I will be building.
+
+I first had to uncompress the annotations file:
+
+tar -xvzf genome_assemblies_genome_gff.tar.gz
+gunzip GCF_000005505.3_Brachypodium_distachyon_v3.0_genomic.gff.gz
+
+I then had to convert the annotation file from gff to gtf. This required
+installation of a tool called gffread with miniconda:
+
+conda install -c bioconda gffread
+
+The command for gffread is:
+
+gffread --gtf GCF_000005505.3_Brachypodium_distachyon_v3.0_genomic.gff > Brachypodium_distachyon_annotations.gtf
+
+I then renamed my reference genome file (I find it easier to work with files
+with concise names):
+
+cp GCF_000005505.3_Brachypodium_distachyon_v3.0_genomic.fasta Brachypodium_distachyon_genome.fa
+
+Finally, I used a bash script to create the index. The script is not in 
+this repository but can be found in one of my directories on the cluster.
+The command used in the script to create the index was:
+
+hisat2-build -p 16 Brachypodium_distachyon_genome.fa Brachypodium_distachyon_genome
+
+-----------------------------------------------------------------------------------------------------------------------
+
+2. Align the samples
+
+I used another bash script with the following command to align the reads 
+(repeated for each pair of files):
+
+hisat2 -x Brachypodium_distachyon_genome -1 SRRXXXXXXX_1_CA.fastq -2 SRRXXXXXXX_2_CA.fastq -S SRRXXXXXXX_alignment.sam 
+
+argument meanings (info from http://daehwankimlab.github.io/hisat2/manual/):
+
+	-x <hisat2-idx>
+	The basename of the index for the reference genome. The basename is 
+	the name of any of the index files up to but not including the 
+	final .1.ht2 / etc. hisat2 looks for the specified index first in 
+	the current directory, then in the directory specified in the 
+	HISAT2_INDEXES environment variable.
+	
+	-1 <m1>
+	Comma-separated list of files containing mate 1s (filename usually 
+	includes _1), e.g. -1 flyA_1.fq,flyB_1.fq. Sequences specified with 
+	this option must correspond file-for-file and read-for-read with 
+	those specified in <m2>. Reads may be a mix of different lengths. 
+	If - is specified, hisat2 will read the mate 1s from the “standard 
+	in” or “stdin” filehandle.
+	
+	-2 <m2>
+	Comma-separated list of files containing mate 2s (filename usually 
+	includes _2), e.g. -2 flyA_2.fq,flyB_2.fq.
+	
+	-S <hit>
+	File to write SAM alignments to. By default, alignments are written 
+	to the “standard out” or “stdout” filehandle (i.e. the console).
+
+-----------------------------------------------------------------------------------------------------------------------
+
+3. Alignment stats
+
+Before converting the output SAM files to BAM format, I determined the 
+number of uniquely mapped reads (I got this command from 
+https://scilifelab.github.io/courses/rnaseq/labs/mapping_reads_answers):
+
+grep -cw 'NH:i:1' SRRXXXXXXX_alignment.sam
+
+I then used SAMtools to convert the SAM files to BAM format. I wrote bash
+scripts to convert the files for each sample. This is the main command used:
+
+samtools view -S -b SRRXXXXXXX_alignment.sam > SRRXXXXXXX_alignment.bam
+
+and to determine the total number of reads that mapped for each sample 
+(from https://www.metagenomics.wiki/tools/samtools/number-of-reads-in-bam-file):
+
+samtools view -c -F 260 SRRXXXXXXX_alignment.bam
+
+and to determine the total number of reads in each file:
+
+samtools view -c SRRXXXXXXX_alignment.bam
+
+I calculated the percentage of reads that mapped by dividing the number 
+of mapped reads by the total number of reads for each sample.
+
+I calculated the percentage of uniquely mapped reads by dividing the 
+number of uniquely mapped reads by the number of mapped reads for each 
+sample.
