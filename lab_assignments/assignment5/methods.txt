@@ -1,0 +1,41 @@
+1. Sort BAM files
+I sorted my BAM files by chromosomal position:
+
+samtools sort -o SRRXXXXXX_alignment_sorted.bam SRRXXXXXXX_alignment.bam
+
+2. GTF filtering
+After sorting the BAM files, I attempted to run htseq-count on one of my
+samples to determine strand specificity, but continuously ran into errors
+informing me that my gtf file was missing attributes like gene_id or 
+gene_name. Eventually it was determined that my gtf file contained 
+information for non-protein coding genes (which lack these attributes), 
+so to filter these features out, i used the following commands:
+
+grep gene_name gtf_file_name > filtered.gtf
+cut -f3 filtered.gtf | sort | uniq -c
+
+2. Strand specificity and read counts
+Once the gtf file was filtered, I was able to run htseq-count on a single 
+sample to determine strand specificity & read counts using the following commands:
+
+htseq-count -f bam -r pos -s no --type=exon --idattr=gene_name SRRXXXXXXX_alignment_sorted.bam Brachypodium_distachyon_annotations_filtered.gtf > htseq47_unstranded.tsv 
+htseq-count -f bam -r pos -s yes --type=exon --idattr=gene_name SRRXXXXXXX_alignment_sorted.bam Brachypodium_distachyon_annotations_filtered.gtf > htseq47_stranded.tsv
+htseq-count -f bam -r pos -s reverse --type=exon --idattr=gene_name SRRXXXXXXX_alignment_sorted.bam Brachypodium_distachyon_annotations_filtered.gtf > htseq47_revstranded.tsv
+
+When I used the first command with the argument '-s no,' this told htseq
+that my data was unstranded. The results of this run included the lowest
+number (approximately 400k-500k) of reads classified as "no_feature," 
+meaning they did not map to  any genomic feature in the gtf file. Running 
+htseq with the argument '-s yes' or '-s reverse' resulted in a much greater 
+number (over 5M) of reads classified as "no_feature." This meant my RNAseq
+data was likely unstranded. I proceeded to run htseq on the rest of my 
+samples with the unstranded argument.
+
+3. DESeq2
+I extracted my read count files produced by htseq-count using 'scp.' I 
+renamed them to include genotype (KOZ1 C or T) and convert them to plain
+text files. I placed all of the text files in one directory on my local 
+drive and used the R script we went through in class to generate a MA plot
+and determine the number of differentially expressed genes. The MA plot
+can be found in this repository, and the number of differentially expressed
+genes was 47.
