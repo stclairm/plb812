@@ -1,0 +1,9 @@
+I was unable to run topGO because my gene names did not match between my
+files. :(
+
+If running this analysis in the future, I will be wary of how input
+files are formatted, and be sure to reformat in earlier steps, if 
+necessary.
+
+I've attached my DEseq2 results, formatted GO term file & a screenshot
+showing the failure of topGO in R.
